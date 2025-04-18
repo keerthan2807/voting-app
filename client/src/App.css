@@ -1,0 +1,85 @@
+h1 {
+  color: #333;
+  text-align: center;
+  margin-top: 40px;
+}
+
+h2 {
+  color: #444;
+  margin-bottom: 25px;
+}
+
+.error {
+  color: red;
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #ffeeee;
+  border-radius: 4px;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.option {
+  padding: 15px;
+  border-radius: 6px;
+  background-color: #f9f9f9;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.vote-btn {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 10px 0;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.vote-btn:hover {
+  background-color: #45a049;
+}
+
+.vote-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.result {
+  margin-top: 15px;
+}
+
+.bar {
+  height: 20px;
+  background-color: #e0e0e0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  background-color: #2196F3;
+  transition: width 0.5s ease-in-out;
+}
+
+.count {
+  margin-top: 5px;
+  font-size: 14px;
+  color: #666;
+}
+
+.total {
+  margin-top: 30px;
+  text-align: center;
+  font-weight: bold;
+  color: #333;
+} 
