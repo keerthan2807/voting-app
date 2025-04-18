@@ -6,10 +6,26 @@ function App() {
   const [votes, setVotes] = useState({ option1: 0, option2: 0 });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [voted, setVoted] = useState(false);
+  const [theme, setTheme] = useState('light');
+  const [userName, setUserName] = useState('');
+  const [showNameInput, setShowNameInput] = useState(true);
 
   useEffect(() => {
     // Fetch initial vote counts
     fetchVotes();
+    
+    // Check local storage for theme preference
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    setTheme(savedTheme);
+    document.body.className = savedTheme;
+    
+    // Check if user has voted before
+    const hasVoted = localStorage.getItem('voted');
+    if (hasVoted) {
+      setVoted(true);
+      setShowNameInput(false);
+    }
   }, []);
 
   const fetchVotes = async () => {
@@ -24,11 +40,21 @@ function App() {
   };
 
   const submitVote = async (option) => {
+    if (!userName && showNameInput) {
+      setError('Please enter your name before voting');
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await axios.post('/api/vote', { option });
       setVotes(response.data.votes);
       setError('');
+      setVoted(true);
+      setShowNameInput(false);
+      
+      // Save voted status in local storage
+      localStorage.setItem('voted', 'true');
     } catch (err) {
       setError('Failed to submit vote');
       console.error(err);
@@ -37,29 +63,63 @@ function App() {
     }
   };
 
+  const resetVote = () => {
+    setVoted(false);
+    localStorage.removeItem('voted');
+  };
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    document.body.className = newTheme;
+    localStorage.setItem('theme', newTheme);
+  };
+
   // Calculate percentages
   const total = votes.option1 + votes.option2;
   const option1Percent = total > 0 ? Math.round((votes.option1 / total) * 100) : 0;
   const option2Percent = total > 0 ? Math.round((votes.option2 / total) * 100) : 0;
 
   return (
-    <div className="container">
-      <h1>Voting App</h1>
+    <div className={`app-container ${theme}`}>
+      <header className="header">
+        <h1>Interactive Voting App</h1>
+        <button className="theme-toggle" onClick={toggleTheme}>
+          {theme === 'light' ? '🌙' : '☀️'}
+        </button>
+      </header>
       
       <div className="voting-container">
-        <h2>Make your choice:</h2>
+        {showNameInput && (
+          <div className="user-form">
+            <h3>Welcome to the Voting App!</h3>
+            <input 
+              type="text" 
+              placeholder="Enter your name"
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
+              className="name-input"
+            />
+          </div>
+        )}
+        
+        <h2>Which do you prefer?</h2>
         
         {error && <div className="error">{error}</div>}
         
         <div className="options">
           <div className="option">
-            <h3>Option 1</h3>
+            <div className="option-header">
+              <h3>Coffee</h3>
+              <img src="https://cdn-icons-png.flaticon.com/512/751/751621.png" alt="Coffee" className="option-icon" />
+            </div>
+            <p className="option-description">Rich, aromatic, and perfect to start your day</p>
             <button 
               onClick={() => submitVote('option1')} 
-              disabled={loading}
+              disabled={loading || voted}
               className="vote-btn"
             >
-              Vote
+              {voted && option1Percent > option2Percent ? 'You Voted ✓' : 'Vote'}
             </button>
             <div className="result">
               <div className="bar">
@@ -75,13 +135,17 @@ function App() {
           </div>
           
           <div className="option">
-            <h3>Option 2</h3>
+            <div className="option-header">
+              <h3>Tea</h3>
+              <img src="https://cdn-icons-png.flaticon.com/512/751/751649.png" alt="Tea" className="option-icon" />
+            </div>
+            <p className="option-description">Soothing, diverse, and perfect for relaxation</p>
             <button 
               onClick={() => submitVote('option2')} 
-              disabled={loading}
+              disabled={loading || voted}
               className="vote-btn"
             >
-              Vote
+              {voted && option2Percent > option1Percent ? 'You Voted ✓' : 'Vote'}
             </button>
             <div className="result">
               <div className="bar">
@@ -97,10 +161,19 @@ function App() {
           </div>
         </div>
         
-        <div className="total">
-          <p>Total votes: {total}</p>
+        <div className="total-section">
+          <p className="total">Total votes: {total}</p>
+          {voted && (
+            <button className="reset-btn" onClick={resetVote}>
+              Vote Again
+            </button>
+          )}
         </div>
       </div>
+      
+      <footer className="footer">
+        <p>Created with ❤️ | © 2023 Voting App</p>
+      </footer>
     </div>
   );
 }
