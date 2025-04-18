@@ -30,15 +30,13 @@ app.post('/api/vote', (req, res) => {
   }
 });
 
-// Serve static assets if in production
-if (process.env.NODE_ENV === 'production') {
-  // Set static folder
-  app.use(express.static('client/build'));
+// Serve static assets in all environments when the client/build folder exists
+app.use(express.static(path.join(__dirname, 'client/build')));
 
-  app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
-  });
-}
+// Handle any requests that don't match the ones above
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client/build', 'index.html'));
+});
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
